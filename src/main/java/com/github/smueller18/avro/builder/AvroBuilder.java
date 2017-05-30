@@ -1,4 +1,4 @@
-package de.stephanmueller.avro.builder;
+package com.github.smueller18.avro.builder;
 
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;

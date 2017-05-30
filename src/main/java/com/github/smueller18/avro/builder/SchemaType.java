@@ -1,4 +1,4 @@
-package de.stephanmueller.avro.builder;
+package com.github.smueller18.avro.builder;
 
 /**
  * Copyright 2017 Stephan Müller

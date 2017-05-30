@@ -1,4 +1,4 @@
-package de.stephanmueller.avro.builder;
+package com.github.smueller18.avro.builder;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

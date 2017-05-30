@@ -1,4 +1,4 @@
-package de.stephanmueller.avro.builder;
+package com.github.smueller18.avro.builder;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -9,4 +9,6 @@ import java.lang.annotation.RetentionPolicy;
  */
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface KeyField { }
+public @interface Doc {
+    String value();
+}
