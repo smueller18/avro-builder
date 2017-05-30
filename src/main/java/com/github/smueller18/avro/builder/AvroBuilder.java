@@ -48,6 +48,7 @@ public abstract class AvroBuilder {
         return generateRecord(false);
     }
 
+    @SuppressWarnings("unchecked")
     private GenericRecord generateRecord(boolean isKey) {
 
         GenericRecord record;
@@ -57,23 +58,17 @@ public abstract class AvroBuilder {
         else
             record = new GenericData.Record(getValueSchema());
 
-        Class keyOrValueField;
-        if (isKey)
-            keyOrValueField = KeyField.class;
-        else
-            keyOrValueField = ValueField.class;
-
         Class currentClass = getClass();
         while (currentClass != Object.class) {
 
             for(Field field : currentClass.getDeclaredFields()) {
 
-                if (field.getAnnotation(keyOrValueField) != null) {
+                if (field.getAnnotation((Class) ((isKey) ? Key.class : Value.class)) != null) {
 
                     // NOTE: support for nested types not checked!
                     try {
                         field.setAccessible(true);
-                        record.put(field.getName(), field.get(this));
+                        record.put(getFieldName(field), field.get(this));
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
@@ -96,15 +91,20 @@ public abstract class AvroBuilder {
 
         if(isKey)
             return recordName + "_key";
-        else
-            return recordName + "_value";
+
+        return recordName + "_value";
     }
 
     private String getNamespace() {
         if (getClass().getAnnotation(Namespace.class) != null)
             return getClass().getAnnotation(Namespace.class).value();
-        else
-            return ClassUtils.getPackageName(getClass());
+        return ClassUtils.getPackageName(getClass());
+    }
+
+    private static String getFieldName(Field field) {
+        if(field.getAnnotation(Name.class) != null)
+            return field.getAnnotation(Name.class).value();
+        return field.getName();
     }
 
     @SuppressWarnings("unchecked")
@@ -114,8 +114,8 @@ public abstract class AvroBuilder {
                 .record(getRecordName(isKey))
                 .namespace(getNamespace());
 
-        if (getClass().getAnnotation(Doc.class) != null)
-            recordBuilder.doc(getClass().getAnnotation(Doc.class).value());
+        if (getClass().getAnnotation(Documentation.class) != null)
+            recordBuilder.doc(getClass().getAnnotation(Documentation.class).value());
 
         SchemaBuilder.FieldAssembler fieldAssembler = recordBuilder.fields();
 
@@ -124,16 +124,12 @@ public abstract class AvroBuilder {
 
             for(Field field : currentClass.getDeclaredFields()) {
 
-                if (field.getAnnotation((Class) ((isKey) ? KeyField.class : ValueField.class)) != null) {
+                if (field.getAnnotation((Class) ((isKey) ? Key.class : Value.class)) != null) {
 
-                    SchemaBuilder.FieldBuilder fieldBuilder = fieldAssembler.name(
-                            getClass().getAnnotation(Name.class) != null ?
-                                    getClass().getAnnotation(Name.class).value() :
-                                    field.getName()
-                    );
+                    SchemaBuilder.FieldBuilder fieldBuilder = fieldAssembler.name(getFieldName(field));
 
-                    if (field.getAnnotation(Doc.class) != null) {
-                        fieldBuilder.doc(field.getAnnotation(Doc.class).value());
+                    if (field.getAnnotation(Documentation.class) != null) {
+                        fieldBuilder.doc(field.getAnnotation(Documentation.class).value());
                     }
 
                     switch (FieldTypeUtils.fieldTypeToSchemaType(field)) {

@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
  */
 class AvroBuilderTest {
 
-    private static final String recordName = "recordName.name";
+    private static final String recordName = "record_name";
 
     @Test
-    void AvroBuilderTest() {
+    void Test() {
 
         TestClass firstTest = new TestClass(
                 1, 1.0, null, true,
@@ -38,39 +38,39 @@ class AvroBuilderTest {
         System.out.println("Second test value record: " + secondTest.generateValueRecord());
     }
 
-    @Doc("This is the description of the avro record")
+    @Documentation("This is the description of the avro record")
     @Name(recordName)
     class TestClass extends AvroBuilder {
 
-        @KeyField
+        @Key
         @TimestampMillisType
-        @Doc("timestamp-millis value")
+        @Documentation("timestamp-millis value")
         private long timestamp = 0;
 
-        @ValueField
-        @Doc("not nullable double value")
+        @Value
+        @Documentation("not nullable double value")
         private double doubleValue = 0;
 
-        @ValueField
-        @Doc("nullable double value")
+        @Value
+        @Documentation("nullable double value")
         private Double nullableDoubleValue = null;
 
-        @ValueField
-        @Doc("boolean value")
+        @Value
+        @Documentation("boolean value")
         private boolean booleanValue;
 
-        @ValueField
-        @Doc("string value which cannot be null")
+        @Value
+        @Documentation("string value which cannot be null")
         private String stringValue;
 
-        @ValueField
+        @Value
         @Name("String_Value_With_Custom_Name")
-        @Doc("string value which cannot be null")
+        @Documentation("string value which cannot be null")
         private String stringValueWithCustomName;
 
-        @ValueField
+        @Value
         @Nullable
-        @Doc("string value which can be null")
+        @Documentation("string value which can be null")
         private String nullableStringValue;
 
         TestClass(long timestamp, double doubleValue, Double nullableDoubleValue, boolean booleanValue,

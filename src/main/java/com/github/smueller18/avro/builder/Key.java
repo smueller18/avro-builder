@@ -9,4 +9,4 @@ import java.lang.annotation.RetentionPolicy;
  */
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface KeyField { }
+public @interface Key { }
