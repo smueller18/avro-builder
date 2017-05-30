@@ -2,16 +2,12 @@ package com.github.smueller18.avro.builder;
 
 import org.apache.avro.generic.GenericRecord;
 
-import java.util.logging.Logger;
-
 /**
  * Copyright 2017 Stephan Müller
  * License: MIT
  */
 
 public class GenericKeyValueRecord {
-
-    private static final Logger log = Logger.getLogger( GenericKeyValueRecord.class.getName() );
 
     private GenericRecord key;
     private GenericRecord value;

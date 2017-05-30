@@ -70,7 +70,7 @@ public abstract class AvroBuilder {
 
                 if (field.getAnnotation(keyOrValueField) != null) {
 
-                    // NOTE: only supports single fields of type AllowedSchemaFiledType so far
+                    // NOTE: support for nested types not checked!
                     try {
                         field.setAccessible(true);
                         record.put(field.getName(), field.get(this));
@@ -87,32 +87,50 @@ public abstract class AvroBuilder {
 
     }
 
+    private String getRecordName(boolean isKey) {
+        String recordName;
+        if (getClass().getAnnotation(Name.class) != null)
+            recordName = getClass().getAnnotation(Name.class).value();
+        else
+            recordName = getClass().getName().replace("$", ".");
+
+        if(isKey)
+            return recordName + "_key";
+        else
+            return recordName + "_value";
+    }
+
+    private String getNamespace() {
+        if (getClass().getAnnotation(Namespace.class) != null)
+            return getClass().getAnnotation(Namespace.class).value();
+        else
+            return ClassUtils.getPackageName(getClass());
+    }
+
+    @SuppressWarnings("unchecked")
     private Schema buildSchema(boolean isKey) {
 
-        Class keyOrValueField;
-        if (isKey)
-            keyOrValueField = KeyField.class;
-        else
-            keyOrValueField = ValueField.class;
-
         SchemaBuilder.RecordBuilder recordBuilder = SchemaBuilder
-                .record(getClass().getName().replace("$", ".") + ((isKey) ? "_key": "_value"))
-                .namespace(ClassUtils.getPackageName(getClass()));
+                .record(getRecordName(isKey))
+                .namespace(getNamespace());
 
         if (getClass().getAnnotation(Doc.class) != null)
             recordBuilder.doc(getClass().getAnnotation(Doc.class).value());
 
         SchemaBuilder.FieldAssembler fieldAssembler = recordBuilder.fields();
 
-
         Class currentClass = getClass();
         while (currentClass != Object.class) {
 
             for(Field field : currentClass.getDeclaredFields()) {
 
-                if (field.getAnnotation(keyOrValueField) != null) {
+                if (field.getAnnotation((Class) ((isKey) ? KeyField.class : ValueField.class)) != null) {
 
-                    SchemaBuilder.FieldBuilder fieldBuilder = fieldAssembler.name(field.getName());
+                    SchemaBuilder.FieldBuilder fieldBuilder = fieldAssembler.name(
+                            getClass().getAnnotation(Name.class) != null ?
+                                    getClass().getAnnotation(Name.class).value() :
+                                    field.getName()
+                    );
 
                     if (field.getAnnotation(Doc.class) != null) {
                         fieldBuilder.doc(field.getAnnotation(Doc.class).value());
@@ -167,12 +185,9 @@ public abstract class AvroBuilder {
                         case NULL:
                             fieldBuilder.type().nullType().noDefault();
                             break;
-
                     }
                 }
-
             }
-
             currentClass = currentClass.getSuperclass();
         }
 
