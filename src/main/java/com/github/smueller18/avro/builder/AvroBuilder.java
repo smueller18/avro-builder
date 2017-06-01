@@ -19,7 +19,7 @@ public abstract class AvroBuilder {
 
     private static HashMap<String, KeyValueSchema> classSchemas = new HashMap<>();
 
-    public AvroBuilder() {
+    public AvroBuilder() throws RuntimeException {
 
         if(this.getClass().getAnnotation(KafkaTopic.class) == null)
             throw new RuntimeException(
@@ -111,7 +111,7 @@ public abstract class AvroBuilder {
         return field.getName();
     }
 
-    public static String getTopicName(Class<? extends AvroBuilder> cla) {
+    public static String getTopicName(Class<? extends AvroBuilder> cla) throws RuntimeException {
         if (cla.getAnnotation(KafkaTopic.class) != null)
             return cla.getAnnotation(KafkaTopic.class).value();
         else
