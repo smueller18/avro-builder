@@ -23,7 +23,7 @@ public abstract class AvroBuilder {
 
         if(this.getClass().getAnnotation(KafkaTopic.class) == null)
             throw new RuntimeException(
-                    String.format("Annotation KafkaTopic() has to be defined for class %s", this.getClass().getName())
+                    String.format("Annotation @KafkaTopic has to be defined for class %s", this.getClass().getName())
             );
 
         if(!classSchemas.containsKey(this.getClass().getName()))
@@ -111,12 +111,12 @@ public abstract class AvroBuilder {
         return field.getName();
     }
 
-    static String getTopicName(Class<? extends AvroBuilder> cla) {
+    public static String getTopicName(Class<? extends AvroBuilder> cla) {
         if (cla.getAnnotation(KafkaTopic.class) != null)
             return cla.getAnnotation(KafkaTopic.class).value();
         else
             throw new RuntimeException(
-                String.format("Annotation KafkaTopic() has to be defined for class %s", cla.getName())
+                String.format("Annotation @KafkaTopic has to be defined for class %s", cla.getName())
             );
     }
 
