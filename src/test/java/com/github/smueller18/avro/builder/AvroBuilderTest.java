@@ -23,8 +23,8 @@ class AvroBuilderTest {
         assert firstTest.getValueSchema() != null;
 
         System.out.println("First test schemas: " + firstTest);
-        System.out.println("First test key record: " + firstTest.generateKeyRecord());
-        System.out.println("First test value record: " + firstTest.generateValueRecord());
+        System.out.println("First test key record: " + firstTest.getKeyRecord());
+        System.out.println("First test value record: " + firstTest.getValueRecord());
 
         TestClass secondTest = new TestClass(
                 1, 1.0, 5.0, true,
@@ -35,8 +35,8 @@ class AvroBuilderTest {
         assert secondTest.getValueSchema() != null;
 
         System.out.println("Second test schemas: " + secondTest);
-        System.out.println("Second test key record: " + secondTest.generateKeyRecord());
-        System.out.println("Second test value record: " + secondTest.generateValueRecord());
+        System.out.println("Second test key record: " + secondTest.getKeyRecord());
+        System.out.println("Second test value record: " + secondTest.getValueRecord());
     }
 
     @Test

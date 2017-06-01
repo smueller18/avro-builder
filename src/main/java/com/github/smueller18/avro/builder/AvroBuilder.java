@@ -44,16 +44,16 @@ public abstract class AvroBuilder {
         return classSchemas.get(this.getClass().getName()).getValueSchema();
     }
 
-    public final GenericRecord generateKeyRecord() {
-        return generateRecord(true);
+    public final GenericRecord getKeyRecord() {
+        return getRecord(true);
     }
 
-    public final GenericRecord generateValueRecord() {
-        return generateRecord(false);
+    public final GenericRecord getValueRecord() {
+        return getRecord(false);
     }
 
     @SuppressWarnings("unchecked")
-    private GenericRecord generateRecord(boolean isKey) {
+    private GenericRecord getRecord(boolean isKey) {
 
         GenericRecord record;
 
