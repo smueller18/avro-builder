@@ -1,6 +1,7 @@
 package com.github.smueller18.avro.builder;
 
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Copyright 2017 Stephan Müller
@@ -8,10 +9,10 @@ import org.junit.jupiter.api.Test;
  */
 class AvroBuilderTest {
 
-    private static final String recordName = "record_name";
+    private static final String topicName = "topic.name";
 
     @Test
-    void Test() {
+    void testClass() {
 
         TestClass firstTest = new TestClass(
                 1, 1.0, null, true,
@@ -38,9 +39,21 @@ class AvroBuilderTest {
         System.out.println("Second test value record: " + secondTest.generateValueRecord());
     }
 
+    @Test
+    void failingTestClass() {
+        assertThrows(RuntimeException.class, () -> {
+            new FailingTestClass();
+        });
+    }
+
+    @Test
+    void getTopic() {
+        assert AvroBuilder.getTopicName(EmptyTestClass.class).equals(topicName);
+    }
+
+    @KafkaTopic(topicName)
     @Documentation("This is the description of the avro record")
-    @Name(recordName)
-    class TestClass extends AvroBuilder {
+    private class TestClass extends AvroBuilder {
 
         @Key
         @TimestampMillisType
@@ -83,6 +96,16 @@ class AvroBuilderTest {
             this.stringValueWithCustomName = stringValueWithCustomName;
             this.nullableStringValue = nullableStringValue;
         }
+    }
+
+    @KafkaTopic("topic.name")
+    private class EmptyTestClass extends AvroBuilder {
+
+    }
+
+    @Documentation("Class will fail because KafkaTopic is not defined")
+    private class FailingTestClass extends AvroBuilder {
+
     }
 
 }

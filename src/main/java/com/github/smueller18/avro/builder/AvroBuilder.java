@@ -15,12 +15,16 @@ import java.util.HashMap;
  * License: MIT
  */
 
-
 public abstract class AvroBuilder {
 
     private static HashMap<String, KeyValueSchema> classSchemas = new HashMap<>();
 
     public AvroBuilder() {
+
+        if(this.getClass().getAnnotation(KafkaTopic.class) == null)
+            throw new RuntimeException(
+                    String.format("Annotation KafkaTopic() has to be defined for class %s", this.getClass().getName())
+            );
 
         if(!classSchemas.containsKey(this.getClass().getName()))
             classSchemas.put(
@@ -87,7 +91,7 @@ public abstract class AvroBuilder {
         if (getClass().getAnnotation(Name.class) != null)
             recordName = getClass().getAnnotation(Name.class).value();
         else
-            recordName = getClass().getName().replace("$", ".");
+            recordName = getClass().getName().replace("$", "_");
 
         if(isKey)
             return recordName + "_key";
@@ -105,6 +109,15 @@ public abstract class AvroBuilder {
         if(field.getAnnotation(Name.class) != null)
             return field.getAnnotation(Name.class).value();
         return field.getName();
+    }
+
+    static String getTopicName(Class<? extends AvroBuilder> cla) {
+        if (cla.getAnnotation(KafkaTopic.class) != null)
+            return cla.getAnnotation(KafkaTopic.class).value();
+        else
+            throw new RuntimeException(
+                String.format("Annotation KafkaTopic() has to be defined for class %s", cla.getName())
+            );
     }
 
     @SuppressWarnings("unchecked")
