@@ -86,13 +86,6 @@ public abstract class AvroBuilder {
 
     }
 
-    private String getRecordName() {
-        if (getClass().getAnnotation(Name.class) != null)
-            return getClass().getAnnotation(Name.class).value();
-        else
-            return getClass().getName().replace("$", "_");
-    }
-
     private String getNamespace() {
         if (getClass().getAnnotation(Namespace.class) != null)
             return getClass().getAnnotation(Namespace.class).value();
@@ -118,7 +111,7 @@ public abstract class AvroBuilder {
     private Schema buildSchema(boolean isKey) {
 
         SchemaBuilder.RecordBuilder recordBuilder = SchemaBuilder
-                .record(getRecordName())
+                .record(getTopicName(this.getClass()))
                 .namespace(getNamespace());
 
         if (getClass().getAnnotation(Documentation.class) != null)
