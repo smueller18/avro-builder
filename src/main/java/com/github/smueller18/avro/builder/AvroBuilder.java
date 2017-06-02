@@ -118,7 +118,7 @@ public abstract class AvroBuilder {
     private Schema buildSchema(boolean isKey) {
 
         SchemaBuilder.RecordBuilder recordBuilder = SchemaBuilder
-                .record(getRecordName(isKey))
+                .record(getRecordName())
                 .namespace(getNamespace());
 
         if (getClass().getAnnotation(Documentation.class) != null)
