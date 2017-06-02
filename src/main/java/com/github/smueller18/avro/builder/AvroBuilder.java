@@ -5,7 +5,6 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -21,10 +20,7 @@ public abstract class AvroBuilder {
 
     public AvroBuilder() throws RuntimeException {
 
-        if(this.getClass().getAnnotation(KafkaTopic.class) == null)
-            throw new RuntimeException(
-                    String.format("Annotation @KafkaTopic has to be defined for class %s", this.getClass().getName())
-            );
+        validateKafkaTopic(this.getClass());
 
         if(!classSchemas.containsKey(this.getClass().getName()))
             classSchemas.put(
@@ -34,6 +30,25 @@ public abstract class AvroBuilder {
                             this.buildSchema(false)
                     )
             );
+    }
+
+    private static boolean validateKafkaTopic(Class<? extends AvroBuilder> cla) throws RuntimeException {
+
+        if (cla.getAnnotation(KafkaTopic.class) != null) {
+            if (cla.getAnnotation(KafkaTopic.class).name().contains("."))
+                throw new RuntimeException(
+                        String.format("The name parameter of the annotation @KafkaTopic for class %s must not contain dots",
+                                cla.getName()
+                        )
+                );
+        }
+        else {
+            throw new RuntimeException(
+                    String.format("Annotation @KafkaTopic has to be defined for class %s", cla.getName())
+            );
+        }
+
+        return true;
     }
 
     public final Schema getKeySchema() {
@@ -86,33 +101,33 @@ public abstract class AvroBuilder {
 
     }
 
-    private String getNamespace() {
-        if (getClass().getAnnotation(Namespace.class) != null)
-            return getClass().getAnnotation(Namespace.class).value();
-        return ClassUtils.getPackageName(getClass());
-    }
-
     private static String getFieldName(Field field) {
         if(field.getAnnotation(Name.class) != null)
             return field.getAnnotation(Name.class).value();
         return field.getName();
     }
 
+    private static String getNamespace(Class<? extends AvroBuilder> cla) {
+        validateKafkaTopic(cla);
+        return cla.getAnnotation(KafkaTopic.class).namespace();
+    }
+
+    private static String getName(Class<? extends AvroBuilder> cla) {
+        validateKafkaTopic(cla);
+        return cla.getAnnotation(KafkaTopic.class).name();
+    }
+
     public static String getTopicName(Class<? extends AvroBuilder> cla) throws RuntimeException {
-        if (cla.getAnnotation(KafkaTopic.class) != null)
-            return cla.getAnnotation(KafkaTopic.class).value();
-        else
-            throw new RuntimeException(
-                String.format("Annotation @KafkaTopic has to be defined for class %s", cla.getName())
-            );
+        validateKafkaTopic(cla);
+        return cla.getAnnotation(KafkaTopic.class).namespace() + "." + cla.getAnnotation(KafkaTopic.class).name();
     }
 
     @SuppressWarnings("unchecked")
     private Schema buildSchema(boolean isKey) {
 
         SchemaBuilder.RecordBuilder recordBuilder = SchemaBuilder
-                .record(getTopicName(this.getClass()))
-                .namespace(getNamespace());
+                .record(getName(this.getClass()))
+                .namespace(getNamespace(this.getClass()));
 
         if (getClass().getAnnotation(Documentation.class) != null)
             recordBuilder.doc(getClass().getAnnotation(Documentation.class).value());

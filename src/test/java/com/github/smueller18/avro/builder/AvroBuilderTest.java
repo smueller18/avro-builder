@@ -9,12 +9,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 class AvroBuilderTest {
 
-    private static final String topicName = "topic.name";
+    private static final String topicNamespace = "namepsace";
+    private static final String topicName = "topic";
 
     @Test
-    void testClass() {
+    void full() {
 
-        TestClass firstTest = new TestClass(
+        Full firstTest = new Full(
                 1, 1.0, null, true,
                 "string", "customNameString", null
         );
@@ -26,7 +27,7 @@ class AvroBuilderTest {
         System.out.println("First test key record: " + firstTest.getKeyRecord());
         System.out.println("First test value record: " + firstTest.getValueRecord());
 
-        TestClass secondTest = new TestClass(
+        Full secondTest = new Full(
                 1, 1.0, 5.0, true,
                 "string", "string", "string"
         );
@@ -40,20 +41,27 @@ class AvroBuilderTest {
     }
 
     @Test
-    void failingTestClass() {
+    void noTopicDefined() {
         assertThrows(RuntimeException.class, () -> {
-            new FailingTestClass();
+            new NoTopicDefined();
+        });
+    }
+
+    @Test
+    void dotsInTopic() {
+        assertThrows(RuntimeException.class, () -> {
+            new DotsInTopicName();
         });
     }
 
     @Test
     void getTopic() {
-        assert AvroBuilder.getTopicName(EmptyTestClass.class).equals(topicName);
+        assert AvroBuilder.getTopicName(Empty.class).equals("namespace.topic_name");
     }
 
-    @KafkaTopic(topicName)
     @Documentation("This is the description of the avro record")
-    private class TestClass extends AvroBuilder {
+    @KafkaTopic(namespace = topicNamespace, name = topicName)
+    private class Full extends AvroBuilder {
 
         @Key
         @TimestampMillisType
@@ -86,8 +94,8 @@ class AvroBuilderTest {
         @Documentation("string value which can be null")
         private String nullableStringValue;
 
-        TestClass(long timestamp, double doubleValue, Double nullableDoubleValue, boolean booleanValue,
-                  String stringValue, String stringValueWithCustomName, String nullableStringValue) {
+        Full(long timestamp, double doubleValue, Double nullableDoubleValue, boolean booleanValue,
+             String stringValue, String stringValueWithCustomName, String nullableStringValue) {
             this.timestamp = timestamp;
             this.doubleValue = doubleValue;
             this.nullableDoubleValue = nullableDoubleValue;
@@ -98,13 +106,19 @@ class AvroBuilderTest {
         }
     }
 
-    @KafkaTopic("topic.name")
-    private class EmptyTestClass extends AvroBuilder {
+    @KafkaTopic(namespace = "namespace", name = "topic_name")
+    private class Empty extends AvroBuilder {
 
     }
 
     @Documentation("Class will fail because KafkaTopic is not defined")
-    private class FailingTestClass extends AvroBuilder {
+    private class NoTopicDefined extends AvroBuilder {
+
+    }
+
+    @Documentation("Class initialization will fail because name of KafkaTopic contains dots")
+    @KafkaTopic(namespace = "namespace", name = "topic.name")
+    private class DotsInTopicName extends AvroBuilder {
 
     }
 
