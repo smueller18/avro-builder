@@ -86,17 +86,11 @@ public abstract class AvroBuilder {
 
     }
 
-    private String getRecordName(boolean isKey) {
-        String recordName;
+    private String getRecordName() {
         if (getClass().getAnnotation(Name.class) != null)
-            recordName = getClass().getAnnotation(Name.class).value();
+            return getClass().getAnnotation(Name.class).value();
         else
-            recordName = getClass().getName().replace("$", "_");
-
-        if(isKey)
-            return recordName + "-key";
-
-        return recordName + "-value";
+            return getClass().getName().replace("$", "_");
     }
 
     private String getNamespace() {
