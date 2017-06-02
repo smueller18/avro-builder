@@ -94,9 +94,9 @@ public abstract class AvroBuilder {
             recordName = getClass().getName().replace("$", "_");
 
         if(isKey)
-            return recordName + "_key";
+            return recordName + "-key";
 
-        return recordName + "_value";
+        return recordName + "-value";
     }
 
     private String getNamespace() {
