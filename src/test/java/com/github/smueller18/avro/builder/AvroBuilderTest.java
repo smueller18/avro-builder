@@ -1,6 +1,10 @@
 package com.github.smueller18.avro.builder;
 
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -58,6 +62,16 @@ class AvroBuilderTest {
     void getTopic() {
         assert AvroBuilder.getTopicName(Empty.class).equals("namespace.topic_name");
     }
+
+    @Test
+    void arrayList() {
+        Array array = new Array(1, new ArrayList<>(Arrays.asList(1.0, 2.0, 3.2)), new ArrayList<>(Arrays.asList(1, 2, 3)));
+
+        System.out.println("ArrayList test schemas: " + array);
+        System.out.println("ArrayList test key record: " + array.getKeyRecord());
+        System.out.println("ArrayList test value record: " + array.getValueRecord());
+    }
+
 
     @Documentation("This is the description of the avro record")
     @KafkaTopic(namespace = topicNamespace, name = topicName)
@@ -121,5 +135,30 @@ class AvroBuilderTest {
     private class DotsInTopicName extends AvroBuilder {
 
     }
+
+    @Documentation("Example for an ArrayList")
+    @KafkaTopic(namespace = "namespace", name = "aray_list")
+    private class Array extends AvroBuilder {
+
+        @Key
+        @TimestampMillisType
+        @Documentation("timestamp-millis value")
+        private long timestamp = 0;
+
+        @Value
+        @Documentation("double ArrayList")
+        private ArrayList<Double> doubleArray = null;
+
+        @Value
+        @Documentation("integer ArrayList")
+        private ArrayList<Integer> intArray = null;
+
+        Array(long timestamp, ArrayList<Double> doubleArray, ArrayList<Integer> intArray) {
+            this.timestamp = timestamp;
+            this.doubleArray = doubleArray;
+            this.intArray = intArray;
+        }
+    }
+
 
 }

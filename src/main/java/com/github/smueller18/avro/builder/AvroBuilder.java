@@ -147,56 +147,64 @@ public abstract class AvroBuilder {
                         fieldBuilder.doc(field.getAnnotation(Documentation.class).value());
                     }
 
-                    switch (FieldTypeUtils.fieldTypeToSchemaType(field)) {
+                    // handle ArrayLists
+                    if(field.getType().getName().equals("class java.util.ArrayList"))
+                        fieldBuilder.type(Schema.createArray(Schema.create(
+                                SchemaType.SchemaTypeToAvroSchemaType(SchemaType.fieldTypeToSchemaType(field))
+                        ))).noDefault();
 
-                        case BOOLEAN:
-                            fieldBuilder.type().booleanType().noDefault();
-                            break;
-                        case INT:
-                            fieldBuilder.type().intType().noDefault();
-                            break;
-                        case LONG:
-                            fieldBuilder.type().longType().noDefault();
-                            break;
-                        case FLOAT:
-                            fieldBuilder.type().floatType().noDefault();
-                            break;
-                        case DOUBLE:
-                            fieldBuilder.type().doubleType().noDefault();
-                            break;
-                        case BYTES:
-                            fieldBuilder.type().bytesType().noDefault();
-                            break;
-                        case STRING:
-                            fieldBuilder.type().stringType().noDefault();
-                            break;
-                        case TIMESTAMP_MILLIS:
-                            Schema timestampMillisType = LogicalTypes.timestampMillis().addToSchema(Schema.create(Schema.Type.LONG));
-                            fieldBuilder.type(timestampMillisType).noDefault();
-                            break;
-                        case NULLABLE_INT:
-                            fieldBuilder.type().nullable().intType().noDefault();
-                            break;
-                        case NULLABLE_LONG:
-                            fieldBuilder.type().nullable().longType().noDefault();
-                            break;
-                        case NULLABLE_FLOAT:
-                            fieldBuilder.type().nullable().floatType().noDefault();
-                            break;
-                        case NULLABLE_DOUBLE:
-                            fieldBuilder.type().nullable().doubleType().noDefault();
-                            break;
-                        case NULLABLE_BYTES:
-                            fieldBuilder.type().nullable().bytesType().noDefault();
-                            break;
-                        case NULLABLE_STRING:
-                            fieldBuilder.type().nullable().stringType().noDefault();
-                            break;
+                    // handle other data types
+                    else
+                        switch (SchemaType.fieldTypeToSchemaType(field)) {
 
-                        case NULL:
-                            fieldBuilder.type().nullType().noDefault();
-                            break;
-                    }
+                            case BOOLEAN:
+                                fieldBuilder.type().booleanType().noDefault();
+                                break;
+                            case INT:
+                                fieldBuilder.type().intType().noDefault();
+                                break;
+                            case LONG:
+                                fieldBuilder.type().longType().noDefault();
+                                break;
+                            case FLOAT:
+                                fieldBuilder.type().floatType().noDefault();
+                                break;
+                            case DOUBLE:
+                                fieldBuilder.type().doubleType().noDefault();
+                                break;
+                            case BYTES:
+                                fieldBuilder.type().bytesType().noDefault();
+                                break;
+                            case STRING:
+                                fieldBuilder.type().stringType().noDefault();
+                                break;
+                            case TIMESTAMP_MILLIS:
+                                Schema timestampMillisType = LogicalTypes.timestampMillis().addToSchema(Schema.create(Schema.Type.LONG));
+                                fieldBuilder.type(timestampMillisType).noDefault();
+                                break;
+                            case NULLABLE_INT:
+                                fieldBuilder.type().nullable().intType().noDefault();
+                                break;
+                            case NULLABLE_LONG:
+                                fieldBuilder.type().nullable().longType().noDefault();
+                                break;
+                            case NULLABLE_FLOAT:
+                                fieldBuilder.type().nullable().floatType().noDefault();
+                                break;
+                            case NULLABLE_DOUBLE:
+                                fieldBuilder.type().nullable().doubleType().noDefault();
+                                break;
+                            case NULLABLE_BYTES:
+                                fieldBuilder.type().nullable().bytesType().noDefault();
+                                break;
+                            case NULLABLE_STRING:
+                                fieldBuilder.type().nullable().stringType().noDefault();
+                                break;
+
+                            case NULL:
+                                fieldBuilder.type().nullType().noDefault();
+                                break;
+                        }
                 }
             }
             currentClass = currentClass.getSuperclass();
