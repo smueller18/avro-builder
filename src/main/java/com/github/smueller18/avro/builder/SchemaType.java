@@ -63,7 +63,7 @@ public enum SchemaType {
 
         if (field.getAnnotation(TimestampMillisType.class) != null) {
 
-            if(!(field.getType().getName().equals("long") || field.getType().getName().equals("class java.lang.Long")))
+            if(!(field.getType().getName().equals("long") || field.getType().getName().replace("class ", "").equals("java.lang.Long")))
                 throw new ClassCastException(
                         String.format("the type of field '%s' must be long because it is marked as TimestampMillisType", field.getName())
                 );
@@ -71,7 +71,7 @@ public enum SchemaType {
             return SchemaType.TIMESTAMP_MILLIS;
         }
 
-        if(field.getType().getName().equals("class java.util.ArrayList"))
+        if(field.getType().getName().replace("class ", "").equals("java.util.ArrayList"))
             fieldTypeName = ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].getTypeName();
         else
             fieldTypeName = field.getType().getName();

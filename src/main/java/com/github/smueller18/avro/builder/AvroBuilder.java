@@ -148,7 +148,7 @@ public abstract class AvroBuilder {
                     }
 
                     // handle ArrayLists
-                    if(field.getType().getName().equals("class java.util.ArrayList"))
+                    if(field.getType().getName().replace("class ", "").equals("java.util.ArrayList"))
                         fieldBuilder.type(Schema.createArray(Schema.create(
                                 SchemaType.SchemaTypeToAvroSchemaType(SchemaType.fieldTypeToSchemaType(field))
                         ))).noDefault();
